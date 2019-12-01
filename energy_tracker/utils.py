@@ -1,7 +1,7 @@
 import math
 import datetime
 
-from energy_tracker.models import Device, DayOfTheWeek, Timeframe
+from energy_tracker.models import Device, DayOfTheWeek, Timeframe, Delay
 
 MINUTE_INTERVALS = 1
 
@@ -68,6 +68,7 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None):
     """
     try:
         days = ['Su', 'M', 'T', 'W', 'Th', 'F', 'S']
+        delay = Delay.objects.filter(device=device).first()
         now = datetime.datetime.now()
         schedules = device.room.room_schedules.all()
         if not day_of_the_week:
@@ -80,6 +81,10 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None):
                 minute=minute,
                 second=0,
                 microsecond=0
+            )
+        if delay:
+            now = now - datetime.timedelta(
+                seconds=(delay.delay_value*60)
             )
         current_time = now.time()
         previous_time = now - datetime.timedelta(

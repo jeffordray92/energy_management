@@ -42,4 +42,4 @@ urlpatterns = [
     path('csv/', export_csv_view, name="download_csv"),
 ]
 
-urlpatterns = format_suffix_patterns(urlpatterns)
+# urlpatterns = format_suffix_patterns(urlpatterns)
