@@ -73,11 +73,9 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None):
     2 - On to Off
     """
     try:
-        override = check_override()
-        if override == "ON":
-            pass
-        elif override == "OFF":
-            pass
+        override = check_override(hour, minute)
+        if override is not None:
+            return override
         days = ['Su', 'M', 'T', 'W', 'Th', 'F', 'S']
         delay = Delay.objects.filter(device=device).first()
         schedules = device.room.room_schedules.all()
@@ -170,10 +168,25 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None):
         }
 
 
-def check_override():
-    now = datetime.datetime.now().date()
-    override = OverrideDay.objects.filter(date=now).first()
+def check_override(hour=None, minute=None):
+    now = datetime.datetime.now()
+    if hour is not None and minute is not None:
+        now = now.replace(
+            hour=hour,
+            minute=minute,
+            second=0,
+            microsecond=0
+        )
+    override = OverrideDay.objects.filter(date=now.date()).first()
     if override:
-        return override.override_type
+        if override.override_type == "ON":
+            if now.time() == datetime.time(7, 40):
+                return 1
+            elif now.time() == datetime.time(22, 00):
+                return 2
+            else:
+                return 0
+        elif override.override_type == "OFF":
+            return 0
     else:
         return None
