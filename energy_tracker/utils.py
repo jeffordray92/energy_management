@@ -1,7 +1,13 @@
 import math
 import datetime
 
-from energy_tracker.models import Device, DayOfTheWeek, Timeframe, Delay
+from energy_tracker.models import (
+    Device,
+    DayOfTheWeek,
+    Timeframe,
+    Delay,
+    OverrideDay
+)
 
 MINUTE_INTERVALS = 1
 
@@ -67,14 +73,52 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None):
     2 - On to Off
     """
     try:
+        override = check_override()
+        if override == "ON":
+            pass
+        elif override == "OFF":
+            pass
         days = ['Su', 'M', 'T', 'W', 'Th', 'F', 'S']
         delay = Delay.objects.filter(device=device).first()
-        now = datetime.datetime.now()
         schedules = device.room.room_schedules.all()
         if not day_of_the_week:
             day_of_the_week = days[int(now.strftime("%w"))]
         day_of_the_week = DayOfTheWeek.objects.get(code=day_of_the_week)
 
+        if delay:
+            now = datetime.datetime.now()
+            if hour is not None and minute is not None:
+                now = now.replace(
+                    hour=hour,
+                    minute=minute,
+                    second=0,
+                    microsecond=0
+                )
+            now = now - datetime.timedelta(
+                seconds=(delay.delay_value * 60)
+            )
+            current_time = now.time()
+            current_timeframe = Timeframe.objects.filter(
+                start_time__lte=current_time,
+                end_time__gte=current_time,
+                days__id=day_of_the_week.id,
+                schedules__room__devices=device
+            )
+            if current_timeframe:
+                next_time = now + datetime.timedelta(
+                    seconds=(MINUTE_INTERVALS * 60)
+                )
+                next_time = next_time.time()
+                next_timeframe = Timeframe.objects.filter(
+                    start_time__lte=next_time,
+                    end_time__gte=next_time,
+                    days__id=day_of_the_week.id,
+                    schedules__room__devices=device
+                )
+                if not next_timeframe:
+                    return 2
+
+        now = datetime.datetime.now()
         if hour is not None and minute is not None:
             now = now.replace(
                 hour=hour,
@@ -82,34 +126,54 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None):
                 second=0,
                 microsecond=0
             )
-        if delay:
-            now = now - datetime.timedelta(
-                seconds=(delay.delay_value*60)
-            )
         current_time = now.time()
+        current_timeframe = Timeframe.objects.filter(
+            start_time__lte=current_time,
+            end_time__gte=current_time,
+            days__id=day_of_the_week.id,
+            schedules__room__devices=device
+        )
         previous_time = now - datetime.timedelta(
-            seconds=(MINUTE_INTERVALS*60)
+            seconds=(MINUTE_INTERVALS * 60)
         )
         previous_time = previous_time.time()
-        current_timeframe = Timeframe.objects.filter(
-                start_time__lte=current_time,
-                end_time__gte=current_time,
-                days__id=day_of_the_week.id,
-                schedules__room__devices=device
-        )
         previous_timeframe = Timeframe.objects.filter(
-                start_time__lte=previous_time,
-                end_time__gte=previous_time,
-                days__id=day_of_the_week.id
+            start_time__lte=previous_time,
+            end_time__gte=previous_time,
+            days__id=day_of_the_week.id,
+            schedules__room__devices=device
         )
-        if current_timeframe and not previous_timeframe:
-            return 1
-        elif previous_timeframe and not current_timeframe:
-            return 2
-        else:
-            return 0
+        next_time = now + datetime.timedelta(
+            seconds=(MINUTE_INTERVALS * 60)
+        )
+        next_time = next_time.time()
+        next_timeframe = Timeframe.objects.filter(
+            start_time__lte=next_time,
+            end_time__gte=next_time,
+            days__id=day_of_the_week.id,
+            schedules__room__devices=device
+        )
+
+        if current_timeframe:
+            if not previous_timeframe:
+                return 1
+            if not next_timeframe:
+                if delay:
+                    return 0
+                else:
+                    return 2
+        return 0
     except Exception as e:
         return {
             'success': False,
             'message': str(e)
         }
+
+
+def check_override():
+    now = datetime.datetime.now().date()
+    override = OverrideDay.objects.filter(date=now).first()
+    if override:
+        return override.override_type
+    else:
+        return None
