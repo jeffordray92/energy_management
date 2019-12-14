@@ -15,6 +15,8 @@ Including another URLconf
 """
 from rest_framework.urlpatterns import format_suffix_patterns
 
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic.base import RedirectView
 from django.urls import path, reverse_lazy
@@ -28,10 +30,14 @@ from energy_tracker.views import (
     TrackerListView,
     export_csv_view,
 )
+from energy_management.views import (
+    DashboardView,
+)
 
 
 urlpatterns = [
     path('', RedirectView.as_view(url=reverse_lazy('admin:index'))),
+    path('dashboard/', DashboardView.as_view()),
     path('admin/', admin.site.urls),
     path('entry/', TrackerListView.as_view()),
     path('post/', TempView.as_view()),
@@ -40,6 +46,6 @@ urlpatterns = [
     path('status/<int:hour>/<int:minute>/<str:day>/', AllStatusTimeView.as_view()),
     path('status/<str:device>/<int:hour>/<int:minute>/<str:day>/', DeviceStatusTimeView.as_view()),
     path('csv/', export_csv_view, name="download_csv"),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # urlpatterns = format_suffix_patterns(urlpatterns)
