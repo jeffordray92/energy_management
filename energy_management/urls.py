@@ -36,8 +36,8 @@ from energy_management.views import (
 
 
 urlpatterns = [
-    path('', RedirectView.as_view(url=reverse_lazy('admin:index'))),
-    path('dashboard/', DashboardView.as_view()),
+    path('', RedirectView.as_view(url=reverse_lazy('dashboard'))),
+    path('dashboard/', DashboardView.as_view(), name="dashboard"),
     path('admin/', admin.site.urls),
     path('entry/', TrackerListView.as_view()),
     path('post/', TempView.as_view()),

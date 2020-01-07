@@ -80,6 +80,7 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None):
         delay = Delay.objects.filter(device=device).first()
         schedules = device.room.room_schedules.all()
         if not day_of_the_week:
+            now = datetime.datetime.now()
             day_of_the_week = days[int(now.strftime("%w"))]
         day_of_the_week = DayOfTheWeek.objects.get(code=day_of_the_week)
 
