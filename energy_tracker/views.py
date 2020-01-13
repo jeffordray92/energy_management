@@ -1,5 +1,6 @@
 import csv
 import datetime
+import pytz
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponse
@@ -111,9 +112,11 @@ def export_csv_view(request):
 
     writer = csv.writer(response)
     writer.writerow(['created_at', 'entry_id', 'device_name', 'voltage', 'current', 'power', 'energy', 'power_factor'])
+    manila_tz = pytz.timezone('Asia/Manila')
     for entry in entries:
+        created_at = entry['created_at']
         writer.writerow([
-            entry['created_at'],
+            created_at.isoformat().replace('+00:00', '+08:00'),
             entry['id'],
             entry.get('device__name',""),
             entry['voltage'],
