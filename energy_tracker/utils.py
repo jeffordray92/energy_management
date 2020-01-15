@@ -10,6 +10,7 @@ from energy_tracker.models import (
 )
 
 MINUTE_INTERVALS = 1
+MINUTE_INTERVALS_PADDING = 3
 
 
 def convert_non_integer_to_zero(data):
@@ -84,38 +85,38 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None):
             day_of_the_week = days[int(now.strftime("%w"))]
         day_of_the_week = DayOfTheWeek.objects.get(code=day_of_the_week)
 
-        if delay:
-            now = datetime.datetime.now()
-            if hour is not None and minute is not None:
-                now = now.replace(
-                    hour=hour,
-                    minute=minute,
-                    second=0,
-                    microsecond=0
-                )
-            now = now - datetime.timedelta(
-                seconds=(delay.delay_value * 60)
-            )
-            current_time = now.time()
-            current_timeframe = Timeframe.objects.filter(
-                start_time__lte=current_time,
-                end_time__gte=current_time,
-                days__id=day_of_the_week.id,
-                schedules__room__devices=device
-            )
-            if current_timeframe:
-                next_time = now + datetime.timedelta(
-                    seconds=(MINUTE_INTERVALS * 60)
-                )
-                next_time = next_time.time()
-                next_timeframe = Timeframe.objects.filter(
-                    start_time__lte=next_time,
-                    end_time__gte=next_time,
-                    days__id=day_of_the_week.id,
-                    schedules__room__devices=device
-                )
-                if not next_timeframe:
-                    return 2
+        # if delay:
+        #     now = datetime.datetime.now()
+        #     if hour is not None and minute is not None:
+        #         now = now.replace(
+        #             hour=hour,
+        #             minute=minute,
+        #             second=0,
+        #             microsecond=0
+        #         )
+        #     now = now - datetime.timedelta(
+        #         seconds=(delay.delay_value * 60)
+        #     )
+        #     current_time = now.time()
+        #     current_timeframe = Timeframe.objects.filter(
+        #         start_time__lte=current_time,
+        #         end_time__gte=current_time,
+        #         days__id=day_of_the_week.id,
+        #         schedules__room__devices=device
+        #     )
+        #     if current_timeframe:
+        #         next_time = now + datetime.timedelta(
+        #             seconds=(MINUTE_INTERVALS * 60)
+        #         )
+        #         next_time = next_time.time()
+        #         next_timeframe = Timeframe.objects.filter(
+        #             start_time__lte=next_time,
+        #             end_time__gte=next_time,
+        #             days__id=day_of_the_week.id,
+        #             schedules__room__devices=device
+        #         )
+        #         if not next_timeframe:
+        #             return 2
 
         now = datetime.datetime.now()
         if hour is not None and minute is not None:
@@ -126,9 +127,15 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None):
                 microsecond=0
             )
         current_time = now.time()
-        current_timeframe = Timeframe.objects.filter(
+        ct = Timeframe.objects.filter(
             start_time__lte=current_time,
             end_time__gte=current_time,
+            days__id=day_of_the_week.id
+        )
+        print(ct)
+        current_timeframe = Timeframe.objects.filter(
+            start_time__lte=current_time,
+            end_time__gt=current_time,
             days__id=day_of_the_week.id,
             schedules__room__devices=device
         )
@@ -152,15 +159,49 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None):
             days__id=day_of_the_week.id,
             schedules__room__devices=device
         )
+        previous_time_padding = now - datetime.timedelta(
+            seconds=(MINUTE_INTERVALS * 60 * MINUTE_INTERVALS_PADDING)
+        )
+        previous_time_padding = previous_time_padding.time()
+        previous_timeframe_padding = Timeframe.objects.filter(
+            start_time__lte=previous_time_padding,
+            end_time__gte=previous_time_padding,
+            days__id=day_of_the_week.id,
+            schedules__room__devices=device
+        )
+        next_time_padding = now + datetime.timedelta(
+            seconds=(MINUTE_INTERVALS * 60 * MINUTE_INTERVALS_PADDING)
+        )
+        next_time_padding = next_time_padding.time()
+        next_timeframe_padding = Timeframe.objects.filter(
+            start_time__lte=next_time_padding,
+            end_time__gte=next_time_padding,
+            days__id=day_of_the_week.id,
+            schedules__room__devices=device
+        )
+
+        # if current_timeframe:
+        #     if not previous_timeframe:
+        #         return 1
+        #     if not next_timeframe:
+        #         if delay:
+        #             return 0
+        #         else:
+        #             return 2
+        # return 0
+        print(current_time)
+        print(day_of_the_week)
+        print(current_timeframe)
+        print(bool(current_timeframe))
+        print(bool(previous_timeframe))
+        print(bool(previous_timeframe_padding))
 
         if current_timeframe:
-            if not previous_timeframe:
+            if (not previous_timeframe) or (not previous_timeframe_padding):
                 return 1
-            if not next_timeframe:
-                if delay:
-                    return 0
-                else:
-                    return 2
+        else:
+            if (previous_timeframe) or (previous_timeframe_padding):
+                return 2
         return 0
     except Exception as e:
         return {
