@@ -10,6 +10,8 @@ from energy_tracker.models import (
     OverrideDay,
     Delay,
     CalibrationValue,
+    ScheduleChange,
+    ScheduleChangePairings
 )
 
 
@@ -56,6 +58,16 @@ class CalibrationAdmin(admin.ModelAdmin):
     list_display = ['device', 'field', 'value']
 
 
+class ScheduleChangePairInline(admin.TabularInline):
+    model = ScheduleChangePairings
+    extra = 0
+
+
+class ScheduleChangeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'date']
+    inlines = [ScheduleChangePairInline,]
+
+
 admin.site.register(TrackerEntry, EntryAdmin)
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(Room, RoomAdmin)
@@ -65,6 +77,7 @@ admin.site.register(DayOfTheWeek, DayAdmin)
 admin.site.register(OverrideDay, OverrideAdmin)
 admin.site.register(Delay, DelayAdmin)
 admin.site.register(CalibrationValue, CalibrationAdmin)
+admin.site.register(ScheduleChange, ScheduleChangeAdmin)
 
 
 admin.site.site_header = "Energy Management Admin"

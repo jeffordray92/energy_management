@@ -31,6 +31,7 @@ from energy_tracker.views import (
     export_csv_view,
 )
 from energy_management.views import (
+    AboutView,
     DashboardView,
 )
 
@@ -38,13 +39,14 @@ from energy_management.views import (
 urlpatterns = [
     path('', RedirectView.as_view(url=reverse_lazy('dashboard'))),
     path('dashboard/', DashboardView.as_view(), name="dashboard"),
+    path('about/', AboutView.as_view(), name="about"),
     path('admin/', admin.site.urls),
     path('entry/', TrackerListView.as_view()),
     path('post/', TempView.as_view()),
     path('status/', AllStatusView.as_view()),
     path('status/<str:device>/', DeviceStatusView.as_view()),
-    path('status/<int:hour>/<int:minute>/<str:day>/', AllStatusTimeView.as_view()),
-    path('status/<str:device>/<int:hour>/<int:minute>/<str:day>/', DeviceStatusTimeView.as_view()),
+    path('status/<int:hour>/<int:minute>/<str:date>/', AllStatusTimeView.as_view()),
+    path('status/<str:device>/<int:hour>/<int:minute>/<str:date>/', DeviceStatusTimeView.as_view()),
     path('csv/', export_csv_view, name="download_csv"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

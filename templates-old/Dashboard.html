@@ -1,0 +1,61 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/Stylesheet.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <title>Energy Management System v1.0</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<script src="{% static 'js/ButtonControls.js' %}"></script>
+<body>
+<input type="hidden" id="myVar" name="variable" value="{{ data }}">
+
+<div class="header">
+  <h1>Epic Energy Management System</h1>
+  <p>This header is unnecessary</p>
+</div>
+
+<div class="navbar">
+  <a href="Dashboard.html" class="active"><i class="fa fa-fw fa-home"></i>Home</a>
+  <a href="https://energy-management-ea9e3.appspot.com/admin/energy_tracker/schedule/add/" target="_blank"><i class="fa fa-fw fa-calendar-plus-o"></i> Add Schedule</a>
+  <a href="https://energy-management-ea9e3.appspot.com/admin/energy_tracker/trackerentry/" target="_blank"><i class="fa fa-fw fa-database"></i> Database</a>
+  <a href="https://energy-management-ea9e3.appspot.com/admin/" target="_blank"><i class="fa fa-fw fa-cogs"></i> Admin Panel</a>
+  <a href="AboutUs.html" class="right"><i class="fa fa-fw fa-id-card-o"></i> About Us</a>
+</div>
+
+<div class="row">
+
+    <div class="leftcol">
+        <script src="{% static 'js/highcharts.js' %}"></script>
+        <script src="https://code.highcharts.com/modules/data.js"></script>
+        <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+        <div class="row2">
+          <div class="leftcol2">
+            <h2>Something here or nah</h2>
+          </div>
+          <div class="leftcol2">
+            <h2>Why there be white space below</h2>
+          </div>
+        </div>
+    </div>
+
+    <div class="rightcol">
+        <h4>Select Room:
+        <select class="dropdown" id="room" onChange="filter_room()">
+          <option {% if room == 'T101' %}selected{% endif %} value="T101">T101</option>
+          <option {% if room == 'T102' %}selected{% endif %} value="T102">T102</option>
+        </select></p>
+      <button id="hourly" {% if freq == 'hourly' %}disabled{% endif %} class="button button1" onclick="btn1()">HOURLY</button></p>
+      <button id="daily" {% if freq == 'daily' %}disabled{% endif %} class="button button1" onclick="btn2()">DAILY</button></p>
+      <button id="weekly" {% if freq == 'weekly' %}disabled{% endif %} class="button button1" onclick="btn3()">WEEKLY</button></p>
+      <button id="monthly" {% if freq == 'monthly' %}disabled{% endif %} class="button button1" onclick="btn4()">MONTHLY</button></p>
+      <button id="yearly" {% if freq == 'yearly' %}disabled{% endif %} class="button button1" onclick="btn5()">YEARLY</button>
+    </div>
+</div>
+</body>
+<script src="{% static 'js/CreateChart.js' %}"></script>
+</html>

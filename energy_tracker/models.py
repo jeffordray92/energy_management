@@ -180,3 +180,32 @@ class CalibrationValue(models.Model):
     class Meta:
         verbose_name = "Calibration Value"
         verbose_name_plural = "Calibration Values"
+
+
+class ScheduleChange(models.Model):
+
+    name = models.CharField(max_length=50)
+    date = models.DateField()
+
+    def __str__(self):
+        return f"{self.name} ({self.date})"
+
+    class Meta:
+        verbose_name = "Schedule Change"
+        verbose_name_plural = "Schedule Change List"
+
+
+class ScheduleChangePairings(models.Model):
+
+    schedule_date = models.ForeignKey(
+        "energy_tracker.ScheduleChange",
+        on_delete=models.CASCADE,
+        related_name="schedule_date_pair",
+    )
+    schedule = models.ForeignKey(
+        "energy_tracker.Timeframe",
+        on_delete=models.CASCADE,
+        related_name="schedule_pair",
+    )
+    start_time = models.TimeField()
+    end_time = models.TimeField()

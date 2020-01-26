@@ -70,16 +70,20 @@ class AllStatusTimeView(APIView):
     """
     List all devices with change in status for a given time
     """
-    def get(self, request, hour, minute, day, format=None):
-        return Response({"devices": get_devices_with_change(day, hour, minute)}, status=status.HTTP_200_OK)
+    def get(self, request, hour, minute, date, format=None):
+        days = ['Su', 'M', 'T', 'W', 'Th', 'F', 'S']
+        day = days[int(datetime.datetime.strptime(date, '%Y-%m-%d').strftime("%w"))]
+        return Response({"devices": get_devices_with_change(day, hour, minute, date)}, status=status.HTTP_200_OK)
 
 
 class DeviceStatusTimeView(APIView):
     """
     Return status change for a device for a given time
     """
-    def get(self, request, device, hour, minute, day, format=None):
-        change_status = get_change_status(device, day, hour, minute)
+    def get(self, request, device, hour, minute, date, format=None):
+        days = ['Su', 'M', 'T', 'W', 'Th', 'F', 'S']
+        day = days[int(datetime.datetime.strptime(date, '%Y-%m-%d').strftime("%w"))]
+        change_status = get_change_status(device, day, hour, minute, date)
         if change_status['success']:
             return Response(change_status['value'], status=status.HTTP_200_OK)
         else:

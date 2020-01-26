@@ -3,9 +3,11 @@ import json
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
+from django.views.generic.base import TemplateView
 
 from energy_tracker.models import Room
 from energy_management.utils import get_entries
+
 
 class DashboardView(View):
     template_name = 'Dashboard.html'
@@ -27,3 +29,7 @@ class DashboardView(View):
             'room': roomname,
             'freq': frequency
         })
+
+
+class AboutView(TemplateView):
+    template_name = 'AboutUs.html'

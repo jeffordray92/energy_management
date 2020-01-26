@@ -2,23 +2,28 @@ import csv
 import datetime
 
 from collections import OrderedDict
+from pytz import timezone
 
 from energy_tracker.models import TrackerEntry, Device
 
 
-def get_entries(room, frequency=None):
+def get_entries(room, frequency="hourly"):
     current_time = datetime.datetime.now()
+
+    # PLEASE DELETE AFTER!!!!
+    current_time = current_time.replace(day=14, month=12, year=2019)
     devices = Device.objects.filter(room=room)
 
-    if not frequency:
-        display_data = TrackerEntry.objects.all()
+    data = []
 
     if frequency == "hourly":
         current_time = current_time - datetime.timedelta(hours=1)
         display_data = TrackerEntry.objects.filter(created_at__gte=current_time, device__in=devices)
     elif frequency == "daily":
-        current_time = current_time - datetime.timedelta(days=1)
-        display_data = TrackerEntry.objects.filter(created_at__gte=current_time, device__in=devices)
+        display_data = TrackerEntry.objects.filter(created_at__date=current_time.date())
+        current_time = current_time.astimezone(timezone('Asia/Manila'))
+        # current_time = current_time - datetime.timedelta(days=1)
+        # display_data = TrackerEntry.objects.filter(created_at__gte=current_time, device__in=devices)
     elif frequency == "weekly":
         current_time = current_time - datetime.timedelta(weeks=1)
         display_data = TrackerEntry.objects.filter(created_at__gte=current_time, device__in=devices)
@@ -29,15 +34,43 @@ def get_entries(room, frequency=None):
         current_time = current_time - datetime.timedelta(weeks=52)
         display_data = TrackerEntry.objects.filter(created_at__gte=current_time, device__in=devices)
 
-    data = []
 
-    data.append(list(OrderedDict.fromkeys([x.created_at.strftime("%D, %H:%M") for x in display_data.order_by('created_at')])))
+    data.append(format_time_entries(display_data))
 
     for device in devices:
         filtered_data = display_data.filter(device=device).order_by('created_at')
         data.append([x.power for x in filtered_data])
 
     return data
+
+
+def format_entries_by_average(display_data, frequency, current_time):
+    data = []
+
+    if frequency == "hourly":
+        data.append(list(OrderedDict.fromkeys([x.created_at.strftime("%D, %H:%M") for x in display_data.order_by('created_at')])))
+
+        for device in devices:
+            filtered_data = display_data.filter(device=device).order_by('created_at')
+            data.append([x.power for x in filtered_data])
+
+
+    if frequency == "daily":
+        last_hour = current_time.hour + 1
+        base_times = [current_time.replace(
+            hour=hour, minute=0, second=0, microsecond=0
+        ) for hour in range(0,last_hour)]
+        data.append([x.strftime("%D, %H:%M") for x in base_times])
+        for device in devices:
+            filtered_data = display_data.filter(device=device)
+            for time in base_times:
+                filtered_data.filter(created_at__gte=time, created_at__lt=time).aggregate(Avg('price'))
+            data.append([x.power for x in filtered_data])
+
+
+def format_time_entries(display_data):
+    formatted_time = list(OrderedDict.fromkeys([x.created_at.astimezone(timezone('Asia/Manila')).strftime("%D, %H:%M") for x in display_data.order_by('created_at')]))
+    return formatted_time
 
 
 def override_entries(filename):

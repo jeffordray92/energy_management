@@ -104,14 +104,24 @@ else:
     #     $ cloud_sql_proxy -instances=[INSTANCE_CONNECTION_NAME]=tcp:3306
     #
     # See https://cloud.google.com/sql/docs/mysql-connect-proxy
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.postgresql',
+    #         'HOST': '127.0.0.1',
+    #         'PORT': '3306',
+    #         'USER': 'gcp-user',
+    #         'PASSWORD': 'bestthesis',
+    #         'NAME': 'energy-management',
+    #     }
+    # }
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'HOST': '127.0.0.1',
-            'PORT': '3306',
-            'USER': 'gcp-user',
-            'PASSWORD': 'bestthesis',
-            'NAME': 'energy-management',
+            'HOST': '',
+            'PORT': '',
+            'USER': 'jeffordmamacus',
+            'PASSWORD': 'alohomora',
+            'NAME': 'energy_management',
         }
     }
     # DATABASES = {

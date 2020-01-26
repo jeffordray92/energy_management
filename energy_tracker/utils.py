@@ -6,7 +6,9 @@ from energy_tracker.models import (
     DayOfTheWeek,
     Timeframe,
     Delay,
-    OverrideDay
+    OverrideDay,
+    ScheduleChange,
+    ScheduleChangePairings
 )
 
 MINUTE_INTERVALS = 1
@@ -25,7 +27,7 @@ def convert_non_integer_to_zero(data):
     return data
 
 
-def get_change_status(device_name, day=None, hour=None, minute=None):
+def get_change_status(device_name, day=None, hour=None, minute=None, date=None):
     try:
         device = Device.objects.get(name=device_name)
         messages = (
@@ -33,7 +35,7 @@ def get_change_status(device_name, day=None, hour=None, minute=None):
             "Status changed: OFF to ON",
             "Status changed: ON to OFF"
         )
-        change_status = check_change_status(device, day, hour, minute)
+        change_status = check_change_status(device, day, hour, minute, date)
         if type(change_status) is dict:
             return change_status
         return {
@@ -47,7 +49,7 @@ def get_change_status(device_name, day=None, hour=None, minute=None):
             'message': str(e)
         }
 
-def get_devices_with_change(day=None, hour=None, minute=None):
+def get_devices_with_change(day=None, hour=None, minute=None, date=None):
     devices = Device.objects.all()
     responses = []
     messages = (
@@ -56,7 +58,7 @@ def get_devices_with_change(day=None, hour=None, minute=None):
         "Status changed: ON to OFF"
     )
     for device in devices:
-        change_status = check_change_status(device, day, hour, minute)
+        change_status = check_change_status(device, day, hour, minute, date)
         if change_status and type(change_status) is int:
             responses.append({
                 'device_name': device.name,
@@ -66,7 +68,7 @@ def get_devices_with_change(day=None, hour=None, minute=None):
             })
     return responses
 
-def check_change_status(device, day_of_the_week=None, hour=None, minute=None):
+def check_change_status(device, day_of_the_week=None, hour=None, minute=None, date=None):
     """
     STATUSES
     0 - No change
@@ -127,57 +129,60 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None):
                 microsecond=0
             )
         current_time = now.time()
+        current_date = datetime.datetime.strptime(date, '%Y-%m-%d').date() if date else now.date()
+
         ct = Timeframe.objects.filter(
             start_time__lte=current_time,
             end_time__gte=current_time,
             days__id=day_of_the_week.id
         )
-        print(ct)
-        current_timeframe = Timeframe.objects.filter(
-            start_time__lte=current_time,
-            end_time__gt=current_time,
-            days__id=day_of_the_week.id,
-            schedules__room__devices=device
+        # ct = get_timeframe(time, day, device, current_date)
+        # print(ct)
+        current_timeframe = get_timeframe(
+            time=current_time,
+            day=day_of_the_week.id,
+            device=device,
+            current_date=current_date
         )
         previous_time = now - datetime.timedelta(
             seconds=(MINUTE_INTERVALS * 60)
         )
         previous_time = previous_time.time()
-        previous_timeframe = Timeframe.objects.filter(
-            start_time__lte=previous_time,
-            end_time__gte=previous_time,
-            days__id=day_of_the_week.id,
-            schedules__room__devices=device
+        previous_timeframe = get_timeframe(
+            time=previous_time,
+            day=day_of_the_week.id,
+            device=device,
+            current_date=current_date
         )
         next_time = now + datetime.timedelta(
             seconds=(MINUTE_INTERVALS * 60)
         )
         next_time = next_time.time()
-        next_timeframe = Timeframe.objects.filter(
-            start_time__lte=next_time,
-            end_time__gte=next_time,
-            days__id=day_of_the_week.id,
-            schedules__room__devices=device
+        next_timeframe = get_timeframe(
+            time=next_time,
+            day=day_of_the_week.id,
+            device=device,
+            current_date=current_date
         )
         previous_time_padding = now - datetime.timedelta(
             seconds=(MINUTE_INTERVALS * 60 * MINUTE_INTERVALS_PADDING)
         )
         previous_time_padding = previous_time_padding.time()
-        previous_timeframe_padding = Timeframe.objects.filter(
-            start_time__lte=previous_time_padding,
-            end_time__gte=previous_time_padding,
-            days__id=day_of_the_week.id,
-            schedules__room__devices=device
+        previous_timeframe_padding = get_timeframe(
+            time=previous_time_padding,
+            day=day_of_the_week.id,
+            device=device,
+            current_date=current_date
         )
         next_time_padding = now + datetime.timedelta(
             seconds=(MINUTE_INTERVALS * 60 * MINUTE_INTERVALS_PADDING)
         )
         next_time_padding = next_time_padding.time()
-        next_timeframe_padding = Timeframe.objects.filter(
-            start_time__lte=next_time_padding,
-            end_time__gte=next_time_padding,
-            days__id=day_of_the_week.id,
-            schedules__room__devices=device
+        next_timeframe_padding = get_timeframe(
+            time=next_time_padding,
+            day=day_of_the_week.id,
+            device=device,
+            current_date=current_date
         )
 
         # if current_timeframe:
@@ -189,12 +194,12 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None):
         #         else:
         #             return 2
         # return 0
-        print(current_time)
-        print(day_of_the_week)
-        print(current_timeframe)
-        print(bool(current_timeframe))
-        print(bool(previous_timeframe))
-        print(bool(previous_timeframe_padding))
+        # print(current_time)
+        # print(day_of_the_week)
+        # print(current_timeframe)
+        # print(bool(current_timeframe))
+        # print(bool(previous_timeframe))
+        # print(bool(previous_timeframe_padding))
 
         if current_timeframe:
             if (not previous_timeframe) or (not previous_timeframe_padding):
@@ -232,3 +237,28 @@ def check_override(hour=None, minute=None):
             return 0
     else:
         return None
+
+
+def get_timeframe(time, day, device, current_date):
+    timeframe = Timeframe.objects.filter(
+        start_time__lte=time,
+        end_time__gte=time,
+        days__id=day,
+        schedules__room__devices=device
+    )
+    schedule_change = ScheduleChange.objects.filter(date=current_date)
+    if schedule_change:
+        schedule_change = schedule_change.first()
+        changed_timeframe = ScheduleChangePairings.objects.filter(
+            start_time__lte=time,
+            end_time__gte=time,
+            schedule__days__id=day,
+            schedule__schedules__room__devices=device
+        )
+        if changed_timeframe:
+            return changed_timeframe
+
+        timeframe = timeframe.exclude(
+            schedule_pair__schedule_date__date=current_date
+        )
+    return timeframe

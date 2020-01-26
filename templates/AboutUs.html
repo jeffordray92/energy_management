@@ -1,9 +1,11 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" type="text/css" href="Stylesheet.css">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/Stylesheet.css' %}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <title>Energy Management System v1.0</title>
+        <title>Energy Management System Dashboard</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
@@ -45,21 +47,30 @@
         <body>
 
         <div class="header">
-            <h1>Epic Energy Management System</h1>
-            <p>This header is unnecessary</p>
+          <h1>Energy Management System</h1>
+          <p></p>Dashboard v1.3</p>
         </div>
         
-        <div class="navbar">
-            <a href="Dashboard.html"><i class="fa fa-fw fa-home"></i>Home</a>
-            <a href="https://energy-management-ea9e3.appspot.com/admin/energy_tracker/schedule/add/" target="_blank"><i class="fa fa-fw fa-calendar-plus-o"></i> Add Schedule</a>
-            <a href="https://energy-management-ea9e3.appspot.com/admin/energy_tracker/trackerentry/" target="_blank"><i class="fa fa-fw fa-database"></i> Database</a>
-            <a href="https://energy-management-ea9e3.appspot.com/admin/" target="_blank"><i class="fa fa-fw fa-cogs"></i> Admin Panel</a>
-            <a href="AboutUs.html" class="active right"><i class="fa fa-fw fa-id-card-o"></i> About Us</a>
-        </div>
+<!--         <div class="navbar" id="myNavbar">
+          <a href="Dashboard.html"><i class="fa fa-fw fa-home"></i>Home</a>
+          <a href="https://energy-management-ea9e3.appspot.com/admin/energy_tracker/schedule/add/" target="_blank"><i class="fa fa-fw fa-calendar-plus-o"></i> Add Schedule</a>
+          <a href="https://energy-management-ea9e3.appspot.com/admin/energy_tracker/trackerentry/" target="_blank"><i class="fa fa-fw fa-database"></i> Database</a>
+          <a href="https://energy-management-ea9e3.appspot.com/admin/" target="_blank"><i class="fa fa-fw fa-cogs"></i> Admin Panel</a>
+          <a href="AboutUs.html" class="active right"><i class="fa fa-fw fa-id-card-o"></i> About Us</a>
+          <a href="javascript:void(0);" class="icon" onclick="myFunction()"><i class="fa fa-bars"></i></a>
+        </div>   -->
+        <div class="navbar" id="myNavbar">
+          <a href="{% url 'dashboard' %}"><i class="fa fa-fw fa-home"></i>Home</a>
+          <a href="{% url 'admin:energy_tracker_schedule_add' %}" target="_blank"><i class="fa fa-fw fa-calendar-plus-o"></i> Add Schedule</a>
+          <a href="{% url 'admin:energy_tracker_trackerentry_changelist' %}" target="_blank"><i class="fa fa-fw fa-database"></i> Database</a>
+          <a href="{% url 'about' %}" target="_blank"><i class="fa fa-fw fa-cogs"></i> Admin Panel</a>
+          <a href="AboutUs.html" class="active right"><i class="fa fa-fw fa-id-card-o"></i> About Us</a>
+          <a href="javascript:void(0);" class="icon" onclick="myFunction()"><i class="fa fa-bars"></i></a>
+        </div> 
         
         <div class="split left1">
           <div class="centered">
-            <img src="avatar1.png" alt="Johnson Hong">
+            <img src="{% static 'img/avatar1.png' %}" alt="Johnson Hong">
             <h2>Johnson Hong</h2>
             <p>Some text.</p>
           </div>
@@ -67,11 +78,21 @@
         
         <div class="split right1">
           <div class="centered">
-            <img src="avatar2.jpg" alt="Johnnephi Mahalingam">
+            <img src="{% static 'img/avatar2.jpg' %}" alt="Johnnephi Mahalingam">
             <h2>Johnnephi Mahalingam</h2>
             <p>Genius, Billionaire, Playboy, Philanthropist</p>
           </div>
         </div>
              
         </body>
+        <script>
+          function myFunction() {
+            var x = document.getElementById("myNavbar");
+            if (x.className === "navbar") {
+              x.className += " responsive";
+            } else {
+              x.className = "navbar";
+            }
+          }
+        </script>
 </html>
