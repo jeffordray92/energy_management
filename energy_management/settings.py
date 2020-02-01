@@ -26,7 +26,7 @@ SECRET_KEY = 'eth3zb2%mczy)a+yv@&h(*su6)5ifwx#h493)ius5bcuxk0ub-'
 DEBUG = True
 
 # ALLOWED_HOSTS = [*]
-ALLOWED_HOSTS = ["energy-management-ea9e3.appspot.com", "localhost"]
+ALLOWED_HOSTS = ["energy-management-ea9e3.appspot.com", "energy-management-266805.appspot.com", "localhost"]
 
 
 # Application definition
@@ -91,7 +91,7 @@ if os.getenv('GAE_APPLICATION', None):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'HOST': '/cloudsql/energy-management-ea9e3:asia-southeast1:energy-management',
+            'HOST': '/cloudsql/energy-management-266805:asia-southeast1:energy-management',
             'USER': 'gcp-user',
             'PASSWORD': 'bestthesis',
             'NAME': 'energy-management',
@@ -104,26 +104,26 @@ else:
     #     $ cloud_sql_proxy -instances=[INSTANCE_CONNECTION_NAME]=tcp:3306
     #
     # See https://cloud.google.com/sql/docs/mysql-connect-proxy
-    # DATABASES = {
-    #     'default': {
-    #         'ENGINE': 'django.db.backends.postgresql',
-    #         'HOST': '127.0.0.1',
-    #         'PORT': '3306',
-    #         'USER': 'gcp-user',
-    #         'PASSWORD': 'bestthesis',
-    #         'NAME': 'energy-management',
-    #     }
-    # }
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'HOST': '',
-            'PORT': '',
-            'USER': 'jeffordmamacus',
-            'PASSWORD': 'alohomora',
-            'NAME': 'energy_management',
+            'HOST': '127.0.0.1',
+            'PORT': '3306',
+            'USER': 'gcp-user',
+            'PASSWORD': 'bestthesis',
+            'NAME': 'energy-management',
         }
     }
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.postgresql',
+    #         'HOST': '',
+    #         'PORT': '',
+    #         'USER': 'jeffordmamacus',
+    #         'PASSWORD': 'alohomora',
+    #         'NAME': 'energy_management',
+    #     }
+    # }
     # DATABASES = {
     #     'default': {
     #         'ENGINE': 'django.db.backends.sqlite3',

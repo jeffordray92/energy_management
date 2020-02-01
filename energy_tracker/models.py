@@ -84,6 +84,7 @@ class Schedule(models.Model):
     class Meta:
         verbose_name = "Room Schedule"
         verbose_name_plural = "Room Schedules"
+        ordering = ['date_time']
 
 
 class Timeframe(models.Model):
@@ -100,6 +101,7 @@ class Timeframe(models.Model):
     class Meta:
         verbose_name = "Time Frame"
         verbose_name_plural = "Time Frame"
+        ordering = ['start_time', 'end_time']
 
 
 class DayOfTheWeek(models.Model):

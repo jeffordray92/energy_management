@@ -82,15 +82,6 @@
     color: white;
   }
 
-  /* Sidebar/right column */
-  .rightcol {   
-    width: 20%;
-    height: 480px;
-    background-color: #121212;
-    padding: 10px;
-    color: white;
-  }
-
   @media screen and (max-width: 700px) {
     .navbar a:not(:first-child) {display: none;}
     .navbar a.icon {
@@ -120,6 +111,11 @@
       float: none;
       display: block;
       width: 100%;
+      height: 40px;
+    }
+    .datepicker {
+      float: none;
+      display: block;
       height: 40px;
     }
   }
@@ -154,15 +150,38 @@
 
   .button:hover {
     background-color: #555555;
-    color: white;
   }
 
   .button:disabled {
     background-color: #555555;
-    color: white;
   }
 
   @media all and (max-width:700px){
     a.button {
      display:block;
- }
+    }
+  }
+
+  .datepicker {
+    display:inline-block;
+    padding: 4px;
+    height: 38px;
+    border: 1.2px solid white;
+    border-radius: 5px;
+    box-sizing: border-box;
+    text-decoration:none;
+    color: white;
+    background-color: #121212;
+    text-align: center;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .datepicker:hover {
+    background-color: #555555;
+  }
+
+  input[type="date"]::-webkit-inner-spin-button {
+    display: none;
+    -webkit-appearance: none;
+  }

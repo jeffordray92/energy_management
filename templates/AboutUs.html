@@ -4,7 +4,7 @@
 <html lang="en">
     <head>
         <link rel="stylesheet" type="text/css" href="{% static 'css/Stylesheet.css' %}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.12.0/css/all.css">
         <title>Energy Management System Dashboard</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -48,7 +48,6 @@
 
         <div class="header">
           <h1>Energy Management System</h1>
-          <p></p>Dashboard v1.3</p>
         </div>
         
 <!--         <div class="navbar" id="myNavbar">
@@ -61,10 +60,11 @@
         </div>   -->
         <div class="navbar" id="myNavbar">
           <a href="{% url 'dashboard' %}"><i class="fa fa-fw fa-home"></i>Home</a>
-          <a href="{% url 'admin:energy_tracker_schedule_add' %}" target="_blank"><i class="fa fa-fw fa-calendar-plus-o"></i> Add Schedule</a>
+          <a href="{% url 'admin:energy_tracker_schedule_add' %}" target="_blank"><i class="far fa-calendar-plus"></i> Add Schedule</a>
+          <a href="{% url 'admin:energy_tracker_schedulechange_add' %}" target="_blank"><i class="fas fa-exchange-alt"></i> Add Schedule Change</a>
           <a href="{% url 'admin:energy_tracker_trackerentry_changelist' %}" target="_blank"><i class="fa fa-fw fa-database"></i> Database</a>
-          <a href="{% url 'about' %}" target="_blank"><i class="fa fa-fw fa-cogs"></i> Admin Panel</a>
-          <a href="AboutUs.html" class="active right"><i class="fa fa-fw fa-id-card-o"></i> About Us</a>
+          <a href="{% url 'admin:index' %}" target="_blank"><i class="fa fa-fw fa-cogs"></i> Admin Panel</a>
+          <a href="{% url 'about' %}" class="active right"><i class="fas fa-id-card-alt"></i> About Us</a>
           <a href="javascript:void(0);" class="icon" onclick="myFunction()"><i class="fa fa-bars"></i></a>
         </div> 
         

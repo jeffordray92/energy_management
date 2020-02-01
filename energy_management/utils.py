@@ -7,23 +7,28 @@ from pytz import timezone
 from energy_tracker.models import TrackerEntry, Device
 
 
-def get_entries(room, frequency="hourly"):
+def get_entries(room, frequency="hourly", start=None, end=None):
+
     current_time = datetime.datetime.now()
+    current_time = current_time.astimezone(timezone('Asia/Manila'))
 
     # PLEASE DELETE AFTER!!!!
-    current_time = current_time.replace(day=14, month=12, year=2019)
+    current_time = current_time.replace(day=10, month=12, year=2019)
     devices = Device.objects.filter(room=room)
 
     data = []
 
     if frequency == "hourly":
+        # time1 = current_time - datetime.timedelta(hours=3)
+        # time2 = current_time - datetime.timedelta(hours=4)
+        # display_data = TrackerEntry.objects.filter(created_at__gte=time2, created_at__lt=time1, device__in=devices)
         current_time = current_time - datetime.timedelta(hours=1)
         display_data = TrackerEntry.objects.filter(created_at__gte=current_time, device__in=devices)
     elif frequency == "daily":
-        display_data = TrackerEntry.objects.filter(created_at__date=current_time.date())
-        current_time = current_time.astimezone(timezone('Asia/Manila'))
-        # current_time = current_time - datetime.timedelta(days=1)
-        # display_data = TrackerEntry.objects.filter(created_at__gte=current_time, device__in=devices)
+        # display_data = TrackerEntry.objects.filter(created_at__date=current_time.date())
+        # current_time = current_time.astimezone(timezone('Asia/Manila'))
+        current_time = current_time - datetime.timedelta(days=1)
+        display_data = TrackerEntry.objects.filter(created_at__gte=current_time, device__in=devices)
     elif frequency == "weekly":
         current_time = current_time - datetime.timedelta(weeks=1)
         display_data = TrackerEntry.objects.filter(created_at__gte=current_time, device__in=devices)
@@ -33,14 +38,28 @@ def get_entries(room, frequency="hourly"):
     elif frequency == "yearly":
         current_time = current_time - datetime.timedelta(weeks=52)
         display_data = TrackerEntry.objects.filter(created_at__gte=current_time, device__in=devices)
+    elif frequency == "range":
+        if start:
+            start_time = datetime.datetime.strptime(start, '%Y-%m-%d').replace(hour=0, minute=0)
+        if end:
+            end_time = datetime.datetime.strptime(end, '%Y-%m-%d').replace(hour=23, minute=59)
+        else:
+            end_time = current_time
+
+        display_data = TrackerEntry.objects.filter(created_at__lte=end_time, device__in=devices)
+        if start:
+            display_data = display_data.filter(created_at__gte=start_time)
 
 
     data.append(format_time_entries(display_data))
 
     for device in devices:
         filtered_data = display_data.filter(device=device).order_by('created_at')
-        data.append([x.power for x in filtered_data])
-
+        new_data = [x.power for x in filtered_data]
+        data.append(new_data)
+        # print(device.name)
+        # if device.name == "Aircon":
+        #     print([(x.power, x.created_at.astimezone(timezone('Asia/Manila')).strftime("%D, %H:%M")) for x in filtered_data])
     return data
 
 

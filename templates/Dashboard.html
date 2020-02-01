@@ -4,14 +4,15 @@
 <html lang="en">
 <head>
   <link rel="stylesheet" type="text/css" href="{% static 'css/Stylesheet.css' %}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.12.0/css/all.css">
   <title>Energy Management System Dashboard</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
-<input type="hidden" id="myVar" name="variable" value="{{ data }}">
+<input type="hidden" id="myData" name="variable" value="{{ data }}">
+<input type="hidden" id="myRoom" name="variable" value="Selected Room: {{ room }}">
 
 <div class="header">
   <h1>Energy Management System</h1>
@@ -19,10 +20,11 @@
 
 <div class="navbar" id="myNavbar">
   <a href="{% url 'dashboard' %}" class="active"><i class="fa fa-fw fa-home"></i>Home</a>
-  <a href="{% url 'admin:energy_tracker_schedule_add' %}" target="_blank"><i class="fa fa-fw fa-calendar-plus-o"></i> Add Schedule</a>
+  <a href="{% url 'admin:energy_tracker_schedule_add' %}" target="_blank"><i class="far fa-calendar-plus"></i> Add Schedule</a>
+  <a href="{% url 'admin:energy_tracker_schedulechange_add' %}" target="_blank"><i class="fas fa-exchange-alt"></i> Add Schedule Change</a>
   <a href="{% url 'admin:energy_tracker_trackerentry_changelist' %}" target="_blank"><i class="fa fa-fw fa-database"></i> Database</a>
   <a href="{% url 'admin:index' %}" target="_blank"><i class="fa fa-fw fa-cogs"></i> Admin Panel</a>
-  <a href="{% url 'about' %}" class="right"><i class="fa fa-fw fa-id-card-o"></i> About Us</a>
+  <a href="{% url 'about' %}" class="right"><i class="fas fa-id-card-alt"></i> About Us</a>
   <a href="javascript:void(0);" class="icon" onclick="myFunction()"><i class="fa fa-bars"></i></a>
 </div>  
 
@@ -41,7 +43,13 @@
         <button id="daily" {% if freq == 'daily' %}disabled{% endif %} class="button" onclick="btn2()">DAILY</button>
         <button id="weekly" {% if freq == 'weekly' %}disabled{% endif %} class="button" onclick="btn3()">WEEKLY</button>
         <button id="monthly" {% if freq == 'monthly' %}disabled{% endif %} class="button" onclick="btn4()">MONTHLY</button>
-        <button id="yearly" {% if freq == 'yearly' %}disabled{% endif %} class="button" onclick="btn5()">YEARLY</button>
+        <button id="range" {% if freq == 'range' %}disabled{% endif %} class="button" onclick="btn6()">SELECT RANGE</button><br>
+        <form onsubmit="rangedate(); return false" id="rangeform" type="hidden" action="#">
+          From <input type="date" class="datepicker" min="2019-01-01" required="required" id="start" {%if freq == 'range' %}value="{{start}}"{% endif %}>
+          to <input type="date" class="datepicker" max="2020-12-31" required="required" id="end" {%if freq == 'range' %}value="{{end}}"{% endif %}>
+          <button class="button">SELECT</button> 
+        </form>
+        {% if freq != 'range' %}<script>document.getElementById("rangeform").hidden = true;</script>{% endif %}
     </div>
 
 </div>

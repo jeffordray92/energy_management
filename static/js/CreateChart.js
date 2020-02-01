@@ -1,8 +1,9 @@
 var defaultData = 'https://demo-live-data.highcharts.com/time-data.csv';
 var container = document.getElementById('container');
-var data = document.getElementById("myVar").value;
+var data = document.getElementById("myData").value;
+var roomname = document.getElementById("myRoom").value;
 
-console.log("UPDATED!!!")
+console.log(roomname)
 
 data = JSON.parse(data)
 
@@ -16,11 +17,9 @@ function createChart() {
             type: 'spline'
         },
         title: {
-            text: 'CLASSROOM ENERGY CONSUMPTION',
+            text: roomname,
             style: {
                 color: '#E0E0E3',
-                textTransform: 'uppercase',
-                fontSize: '20px'
             }
         },
         subtitle: {

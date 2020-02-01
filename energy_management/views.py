@@ -15,19 +15,23 @@ class DashboardView(View):
     def get(self, request, *args, **kwargs):
         roomname = request.GET.get('room')
         frequency = request.GET.get('freq')
+        start = request.GET.get('start')
+        end = request.GET.get('end')
 
         if not roomname: roomname="T101"
         if not frequency: frequency="hourly"
 
         room = Room.objects.get(name=roomname)
-        entries = get_entries(room, frequency)
+        entries = get_entries(room, frequency, start, end)
         display_data = entries
 
         data = json.dumps(display_data)
         return render(request, self.template_name, {
             'data': data,
             'room': roomname,
-            'freq': frequency
+            'freq': frequency,
+            'start': start,
+            'end': end
         })
 
 
