@@ -13,7 +13,7 @@ def get_entries(room, frequency="hourly", start=None, end=None):
     current_time = current_time.astimezone(timezone('Asia/Manila'))
 
     # PLEASE DELETE AFTER!!!!
-    current_time = current_time.replace(day=10, month=12, year=2019)
+    # current_time = current_time.replace(day=10, month=12, year=2019)
     devices = Device.objects.filter(room=room)
 
     data = []

@@ -131,11 +131,11 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None, da
         current_time = now.time()
         current_date = datetime.datetime.strptime(date, '%Y-%m-%d').date() if date else now.date()
 
-        ct = Timeframe.objects.filter(
-            start_time__lte=current_time,
-            end_time__gte=current_time,
-            days__id=day_of_the_week.id
-        )
+        # ct = Timeframe.objects.filter(
+        #     start_time__lte=current_time,
+        #     end_time__gte=current_time,
+        #     days__id=day_of_the_week.id
+        # )
         # ct = get_timeframe(time, day, device, current_date)
         # print(ct)
         current_timeframe = get_timeframe(
@@ -154,16 +154,16 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None, da
             device=device,
             current_date=current_date
         )
-        next_time = now + datetime.timedelta(
-            seconds=(MINUTE_INTERVALS * 60)
-        )
-        next_time = next_time.time()
-        next_timeframe = get_timeframe(
-            time=next_time,
-            day=day_of_the_week.id,
-            device=device,
-            current_date=current_date
-        )
+        # next_time = now + datetime.timedelta(
+        #     seconds=(MINUTE_INTERVALS * 60)
+        # )
+        # next_time = next_time.time()
+        # next_timeframe = get_timeframe(
+        #     time=next_time,
+        #     day=day_of_the_week.id,
+        #     device=device,
+        #     current_date=current_date
+        # )
         previous_time_padding = now - datetime.timedelta(
             seconds=(MINUTE_INTERVALS * 60 * MINUTE_INTERVALS_PADDING)
         )
@@ -174,16 +174,16 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None, da
             device=device,
             current_date=current_date
         )
-        next_time_padding = now + datetime.timedelta(
-            seconds=(MINUTE_INTERVALS * 60 * MINUTE_INTERVALS_PADDING)
-        )
-        next_time_padding = next_time_padding.time()
-        next_timeframe_padding = get_timeframe(
-            time=next_time_padding,
-            day=day_of_the_week.id,
-            device=device,
-            current_date=current_date
-        )
+        # next_time_padding = now + datetime.timedelta(
+        #     seconds=(MINUTE_INTERVALS * 60 * MINUTE_INTERVALS_PADDING)
+        # )
+        # next_time_padding = next_time_padding.time()
+        # next_timeframe_padding = get_timeframe(
+        #     time=next_time_padding,
+        #     day=day_of_the_week.id,
+        #     device=device,
+        #     current_date=current_date
+        # )
 
         # if current_timeframe:
         #     if not previous_timeframe:
@@ -242,7 +242,7 @@ def check_override(hour=None, minute=None):
 def get_timeframe(time, day, device, current_date):
     timeframe = Timeframe.objects.filter(
         start_time__lte=time,
-        end_time__gte=time,
+        end_time__gt=time,
         days__id=day,
         schedules__room__devices=device
     )
