@@ -100,7 +100,8 @@ def override_entries(filename):
             for row in csv_reader:
                 #2019-11-18 8:38:56.067165+00:00
                 created_at = datetime.datetime.strptime(
-                    row['created_at'].replace("+00:00", "+08:00"), '%Y-%m-%d %H:%M:%S.%f%z')
+                    row['created_at'].replace("+08:00", "+00:00"), '%Y-%m-%d %H:%M:%S.%f%z')
+                created_at = created_at.astimezone(tz=timezone('Asia/Manila'))
                 entry_id = int(row['entry_id'])
                 device_name = row['device_name']
                 voltage = float(row['voltage']) if row['voltage'] else 0
@@ -111,19 +112,30 @@ def override_entries(filename):
 
                 device = Device.objects.get(name=device_name)
 
-                obj = TrackerEntry(
-                    id=entry_id,
+                obj, created = TrackerEntry.objects.get_or_create(
                     created_at=created_at,
-                    voltage=voltage,
-                    current=current,
-                    power=power,
-                    energy=energy,
-                    power_factor=power_factor,
                     device=device
                 )
+                obj.voltage = voltage
+                obj.current = current
+                obj.power = power
+                obj.energy = energy
+                obj.power_factor = power_factor
                 obj.save()
-                obj.created_at = created_at
-                obj.save()
+
+                # obj = TrackerEntry(
+                #     id=entry_id,
+                #     created_at=created_at,
+                #     voltage=voltage,
+                #     current=current,
+                #     power=power,
+                #     energy=energy,
+                #     power_factor=power_factor,
+                #     device=device
+                # )
+                # obj.save()
+                # obj.created_at = created_at
+                # obj.save()
                 # print(row)
                 line_count += 1 
                 print(f"Processing Line # {line_count}", end="\r")
