@@ -14,7 +14,7 @@ def get_entries(room, frequency="hourly", start=None, end=None):
 
     # PLEASE DELETE AFTER!!!!
     # current_time = current_time.replace(day=10, month=12, year=2019)
-    devices = Device.objects.filter(room=room)
+    devices = Device.objects.filter(room=room).order_by('name')
 
     data = []
 
@@ -112,30 +112,30 @@ def override_entries(filename):
 
                 device = Device.objects.get(name=device_name)
 
-                obj, created = TrackerEntry.objects.get_or_create(
-                    created_at=created_at,
-                    device=device
-                )
-                obj.voltage = voltage
-                obj.current = current
-                obj.power = power
-                obj.energy = energy
-                obj.power_factor = power_factor
-                obj.save()
-
-                # obj = TrackerEntry(
-                #     id=entry_id,
+                # obj, created = TrackerEntry.objects.get_or_create(
                 #     created_at=created_at,
-                #     voltage=voltage,
-                #     current=current,
-                #     power=power,
-                #     energy=energy,
-                #     power_factor=power_factor,
                 #     device=device
                 # )
+                # obj.voltage = voltage
+                # obj.current = current
+                # obj.power = power
+                # obj.energy = energy
+                # obj.power_factor = power_factor
                 # obj.save()
-                # obj.created_at = created_at
-                # obj.save()
+
+                obj = TrackerEntry(
+                    id=entry_id,
+                    created_at=created_at,
+                    voltage=voltage,
+                    current=current,
+                    power=power,
+                    energy=energy,
+                    power_factor=power_factor,
+                    device=device
+                )
+                obj.save()
+                obj.created_at = created_at
+                obj.save()
                 # print(row)
                 line_count += 1 
                 print(f"Processing Line # {line_count}", end="\r")

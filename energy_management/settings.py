@@ -94,7 +94,7 @@ if os.getenv('GAE_APPLICATION', None):
             'HOST': '/cloudsql/energy-management-266805:asia-southeast1:energy-management',
             'USER': 'gcp-user',
             'PASSWORD': 'bestthesis',
-            'NAME': 'energy-data',
+            'NAME': 'energy-management',
         }
     }
 else:

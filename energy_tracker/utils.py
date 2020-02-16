@@ -80,45 +80,17 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None, da
         if override is not None:
             return override
         days = ['Su', 'M', 'T', 'W', 'Th', 'F', 'S']
-        delay = Delay.objects.filter(device=device).first()
+        delay = Delay.objects.filter(device=device)
+        if delay:
+            delay = delay.first()
+        else:
+            delay = None
         schedules = device.room.room_schedules.all()
         if not day_of_the_week:
             now = datetime.datetime.now()
             day_of_the_week = days[int(now.strftime("%w"))]
         day_of_the_week = DayOfTheWeek.objects.get(code=day_of_the_week)
 
-        # if delay:
-        #     now = datetime.datetime.now()
-        #     if hour is not None and minute is not None:
-        #         now = now.replace(
-        #             hour=hour,
-        #             minute=minute,
-        #             second=0,
-        #             microsecond=0
-        #         )
-        #     now = now - datetime.timedelta(
-        #         seconds=(delay.delay_value * 60)
-        #     )
-        #     current_time = now.time()
-        #     current_timeframe = Timeframe.objects.filter(
-        #         start_time__lte=current_time,
-        #         end_time__gte=current_time,
-        #         days__id=day_of_the_week.id,
-        #         schedules__room__devices=device
-        #     )
-        #     if current_timeframe:
-        #         next_time = now + datetime.timedelta(
-        #             seconds=(MINUTE_INTERVALS * 60)
-        #         )
-        #         next_time = next_time.time()
-        #         next_timeframe = Timeframe.objects.filter(
-        #             start_time__lte=next_time,
-        #             end_time__gte=next_time,
-        #             days__id=day_of_the_week.id,
-        #             schedules__room__devices=device
-        #         )
-        #         if not next_timeframe:
-        #             return 2
 
         now = datetime.datetime.now()
         if hour is not None and minute is not None:
@@ -128,84 +100,36 @@ def check_change_status(device, day_of_the_week=None, hour=None, minute=None, da
                 second=0,
                 microsecond=0
             )
-        current_time = now.time()
-        current_date = datetime.datetime.strptime(date, '%Y-%m-%d').date() if date else now.date()
 
-        # ct = Timeframe.objects.filter(
-        #     start_time__lte=current_time,
-        #     end_time__gte=current_time,
-        #     days__id=day_of_the_week.id
-        # )
-        # ct = get_timeframe(time, day, device, current_date)
-        # print(ct)
-        current_timeframe = get_timeframe(
-            time=current_time,
-            day=day_of_the_week.id,
-            device=device,
-            current_date=current_date
-        )
-        previous_time = now - datetime.timedelta(
-            seconds=(MINUTE_INTERVALS * 60)
-        )
-        previous_time = previous_time.time()
-        previous_timeframe = get_timeframe(
-            time=previous_time,
-            day=day_of_the_week.id,
-            device=device,
-            current_date=current_date
-        )
-        # next_time = now + datetime.timedelta(
-        #     seconds=(MINUTE_INTERVALS * 60)
-        # )
-        # next_time = next_time.time()
-        # next_timeframe = get_timeframe(
-        #     time=next_time,
-        #     day=day_of_the_week.id,
-        #     device=device,
-        #     current_date=current_date
-        # )
-        previous_time_padding = now - datetime.timedelta(
-            seconds=(MINUTE_INTERVALS * 60 * MINUTE_INTERVALS_PADDING)
-        )
-        previous_time_padding = previous_time_padding.time()
-        previous_timeframe_padding = get_timeframe(
-            time=previous_time_padding,
-            day=day_of_the_week.id,
-            device=device,
-            current_date=current_date
-        )
-        # next_time_padding = now + datetime.timedelta(
-        #     seconds=(MINUTE_INTERVALS * 60 * MINUTE_INTERVALS_PADDING)
-        # )
-        # next_time_padding = next_time_padding.time()
-        # next_timeframe_padding = get_timeframe(
-        #     time=next_time_padding,
-        #     day=day_of_the_week.id,
-        #     device=device,
-        #     current_date=current_date
-        # )
+        if delay:
+            delay_value = int(delay.delay_value)
+            now = now - datetime.timedelta(
+                seconds=(delay_value * 60)
+            )
+            current_timeframe, previous_timeframe, previous_timeframe_padding = get_all_timeframes(
+                now, day_of_the_week, hour, minute, date, device
+            )
+            if not current_timeframe:
+                if previous_timeframe or previous_timeframe_padding:
+                    return 2
 
-        # if current_timeframe:
-        #     if not previous_timeframe:
-        #         return 1
-        #     if not next_timeframe:
-        #         if delay:
-        #             return 0
-        #         else:
-        #             return 2
-        # return 0
-        # print(current_time)
-        # print(day_of_the_week)
-        # print(current_timeframe)
-        # print(bool(current_timeframe))
-        # print(bool(previous_timeframe))
-        # print(bool(previous_timeframe_padding))
+        now = datetime.datetime.now()
+        if hour is not None and minute is not None:
+            now = now.replace(
+                hour=hour,
+                minute=minute,
+                second=0,
+                microsecond=0
+            )
+        current_timeframe, previous_timeframe, previous_timeframe_padding = get_all_timeframes(
+            now, day_of_the_week, hour, minute, date, device
+        )
 
         if current_timeframe:
             if (not previous_timeframe) or (not previous_timeframe_padding):
                 return 1
         else:
-            if (previous_timeframe) or (previous_timeframe_padding):
+            if ((previous_timeframe) or (previous_timeframe_padding)) and not delay:
                 return 2
         return 0
     except Exception as e:
@@ -239,7 +163,7 @@ def check_override(hour=None, minute=None):
         return None
 
 
-def get_timeframe(time, day, device, current_date):
+def get_individual_timeframe(time, day, device, current_date):
     timeframe = Timeframe.objects.filter(
         start_time__lte=time,
         end_time__gt=time,
@@ -262,3 +186,54 @@ def get_timeframe(time, day, device, current_date):
             schedule_pair__schedule_date__date=current_date
         )
     return timeframe
+
+
+def get_all_timeframes(now, day_of_the_week, hour, minute, date, device):
+        current_time = now.time()
+        current_date = datetime.datetime.strptime(date, '%Y-%m-%d').date() if date else now.date()
+
+        # ct = Timeframe.objects.filter(
+        #     start_time__lte=current_time,
+        #     end_time__gte=current_time,
+        #     days__id=day_of_the_week.id
+        # )
+        # ct = get_individual_timeframe(time, day, device, current_date)
+        # print(ct)
+        current_timeframe = get_individual_timeframe(
+            time=current_time,
+            day=day_of_the_week.id,
+            device=device,
+            current_date=current_date
+        )
+
+        previous_time = now - datetime.timedelta(
+            seconds=(MINUTE_INTERVALS * 60)
+        )
+        previous_time = previous_time.time()
+        previous_timeframe = get_individual_timeframe(
+            time=previous_time,
+            day=day_of_the_week.id,
+            device=device,
+            current_date=current_date
+        )
+        # next_time = now + datetime.timedelta(
+        #     seconds=(MINUTE_INTERVALS * 60)
+        # )
+        # next_time = next_time.time()
+        # next_timeframe = get_individual_timeframe(
+        #     time=next_time,
+        #     day=day_of_the_week.id,
+        #     device=device,
+        #     current_date=current_date
+        # )
+        previous_time_padding = now - datetime.timedelta(
+            seconds=(MINUTE_INTERVALS * 60 * MINUTE_INTERVALS_PADDING)
+        )
+        previous_time_padding = previous_time_padding.time()
+        previous_timeframe_padding = get_individual_timeframe(
+            time=previous_time_padding,
+            day=day_of_the_week.id,
+            device=device,
+            current_date=current_date
+        )
+        return current_timeframe, previous_timeframe, previous_timeframe_padding

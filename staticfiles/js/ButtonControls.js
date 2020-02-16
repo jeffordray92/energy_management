@@ -21,7 +21,6 @@ function btn1() {
     document.getElementById("daily").disabled = false;
     document.getElementById("weekly").disabled = false;
     document.getElementById("monthly").disabled = false;
-    document.getElementById("yearly").disabled = false;
     document.getElementById("range").disabled = false;
     document.getElementById("rangeform").hidden = true;
     filter_frequency("hourly");
@@ -32,7 +31,6 @@ function btn2() {
     document.getElementById("daily").disabled = true;
     document.getElementById("weekly").disabled = false;
     document.getElementById("monthly").disabled = false;
-    document.getElementById("yearly").disabled = false;
     document.getElementById("range").disabled = false;
     document.getElementById("rangeform").hidden = true;
     filter_frequency("daily");
@@ -43,7 +41,6 @@ function btn3() {
     document.getElementById("daily").disabled = false;
     document.getElementById("weekly").disabled = true;
     document.getElementById("monthly").disabled = false;
-    document.getElementById("yearly").disabled = false;
     document.getElementById("range").disabled = false;
     document.getElementById("rangeform").hidden = true;
     filter_frequency("weekly");
@@ -54,7 +51,6 @@ function btn4() {
     document.getElementById("daily").disabled = false;
     document.getElementById("weekly").disabled = false;
     document.getElementById("monthly").disabled = true;
-    document.getElementById("yearly").disabled = false;
     document.getElementById("range").disabled = false;
     document.getElementById("rangeform").hidden = true;
     filter_frequency("monthly");
@@ -65,7 +61,6 @@ function btn5() {
     document.getElementById("daily").disabled = false;
     document.getElementById("weekly").disabled = false;
     document.getElementById("monthly").disabled = false;
-    document.getElementById("yearly").disabled = true;
     document.getElementById("range").disabled = false;
     document.getElementById("rangeform").hidden = true;
     filter_frequency("yearly");
@@ -76,7 +71,6 @@ function btn6() {
     document.getElementById("daily").disabled = false;
     document.getElementById("weekly").disabled = false;
     document.getElementById("monthly").disabled = false;
-    document.getElementById("yearly").disabled = false;
     document.getElementById("range").disabled = true;
     document.getElementById("rangeform").hidden = false;
 }

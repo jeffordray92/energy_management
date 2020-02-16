@@ -76,7 +76,6 @@ admin.site.register(Timeframe, TimeframeAdmin)
 admin.site.register(DayOfTheWeek, DayAdmin)
 admin.site.register(OverrideDay, OverrideAdmin)
 admin.site.register(Delay, DelayAdmin)
-admin.site.register(CalibrationValue, CalibrationAdmin)
 admin.site.register(ScheduleChange, ScheduleChangeAdmin)
 
 
