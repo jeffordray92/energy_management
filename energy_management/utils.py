@@ -123,18 +123,16 @@ def override_entries(filename):
                 # obj.power_factor = power_factor
                 # obj.save()
 
-                obj = TrackerEntry(
-                    id=entry_id,
-                    created_at=created_at,
-                    voltage=voltage,
-                    current=current,
-                    power=power,
-                    energy=energy,
-                    power_factor=power_factor,
-                    device=device
+                obj, created = TrackerEntry.objects.get_or_create(
+                    id=entry_id
                 )
                 obj.save()
-                obj.created_at = created_at
+                obj.voltage = voltage
+                obj.current = current
+                obj.power = power
+                obj.energy = energy
+                obj.power_factor = power_factor
+                # obj.created_at = created_at
                 obj.save()
                 # print(row)
                 line_count += 1 

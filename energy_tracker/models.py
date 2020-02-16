@@ -14,7 +14,7 @@ class TrackerEntry(models.Model):
     power = models.FloatField()
     energy = models.FloatField()
     power_factor = models.FloatField()
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, verbose_name="Date Saved")
     device = models.ForeignKey(
         "energy_tracker.Device",
         on_delete=models.CASCADE,

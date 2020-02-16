@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from rangefilter.filter import DateRangeFilter
+
 from energy_tracker.models import (
     TrackerEntry,
     Device,
@@ -14,10 +16,18 @@ from energy_tracker.models import (
     ScheduleChangePairings
 )
 
+def custom_titled_filter(title):
+    class Wrapper(admin.FieldListFilter):
+        def __new__(cls, *args, **kwargs):
+            instance = admin.FieldListFilter.create(*args, **kwargs)
+            instance.title = title
+            return instance
+    return Wrapper
+
 
 class EntryAdmin(admin.ModelAdmin):
     list_display = ['created_at', 'device', 'voltage', 'current', 'power', 'energy', 'power_factor']
-    list_filter = ['created_at', 'device']
+    list_filter = [('created_at', DateRangeFilter), ('created_at', custom_titled_filter('Date Saved - Range')), 'device']
     change_list_template = "custom_list.html"
 
 
