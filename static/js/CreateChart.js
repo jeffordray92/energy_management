@@ -42,7 +42,8 @@ function createChart() {
             title: {
                 style: {
                     color: '#A0A0A3'
-                }
+                },
+                text: "Date and Time"
             }
         },
         yAxis: {
@@ -59,7 +60,8 @@ function createChart() {
             title: {
                 style: {
                     color: '#A0A0A3'
-                }
+                },
+                text: "Power (in Wh)"
             }
         },
         tooltip: {

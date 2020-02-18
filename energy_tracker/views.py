@@ -99,6 +99,13 @@ class TempView(APIView):
 def export_csv_view(request):
     # Create the HttpResponse object with the appropriate CSV header.
     query = {k:v for (k,v) in request.GET.items()}
+    for key in query.keys():
+        if "__range__gte" in key:
+            query[key.replace("__range", "")] = query[key] + " 00:00:00+08:00"
+            del query[key]
+        elif "__range__lte" in key:
+            query[key.replace("__range", "")] = query[key] + " 23:59:59+08:00"
+            del query[key]
     queryset = TrackerEntry.objects.filter(**query).order_by('-id')
     entries = queryset.values(
         'id',
@@ -117,9 +124,9 @@ def export_csv_view(request):
     writer = csv.writer(response)
     writer.writerow(['created_at', 'entry_id', 'device_name', 'voltage', 'current', 'power', 'energy', 'power_factor'])
     for entry in entries:
-        created_at = entry['created_at']
+        created_at = entry['created_at'].astimezone(pytz.timezone('Asia/Manila')).strftime("%Y-%m-%d %I:%M%p")
         writer.writerow([
-            created_at.isoformat().replace("+00:00", "+08:00"),
+            created_at,
             entry['id'],
             entry.get('device__name',""),
             entry['voltage'],
