@@ -92,39 +92,14 @@ if os.getenv('GAE_APPLICATION', None):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'HOST': '/cloudsql/energy-management-266805:asia-southeast1:energy-management',
-            'USER': 'gcp-user',
-            'PASSWORD': 'bestthesis',
-            'NAME': 'energy-management-data',
-        }
-    }
-else:
-    # Running locally so connect to either a local MySQL instance or connect to
-    # Cloud SQL via the proxy. To start the proxy via command line:
-    #
-    #     $ cloud_sql_proxy -instances=[INSTANCE_CONNECTION_NAME]=tcp:3306
-    #
-    # See https://cloud.google.com/sql/docs/mysql-connect-proxy
-    # DATABASES = {
-    #     'default': {
-    #         'ENGINE': 'django.db.backends.postgresql',
-    #         'HOST': '127.0.0.1',
-    #         'PORT': '3306',
-    #         'USER': 'gcp-user',
-    #         'PASSWORD': 'bestthesis',
-    #         'NAME': 'energy-management-data',
-    #     }
-    # }
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
             'HOST': '',
             'PORT': '',
             'USER': 'jeffordmamacus',
-            'PASSWORD': 'alohomora',
+            'PASSWORD': 'password',
             'NAME': 'edump2',
         }
     }
+else:
     # DATABASES = {
     #     'default': {
     #         'ENGINE': 'django.db.backends.sqlite3',
